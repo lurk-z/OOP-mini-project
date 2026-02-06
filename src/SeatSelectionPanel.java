@@ -23,14 +23,31 @@ public class SeatSelectionPanel extends JPanel {
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(CinemaAppWindow.BG_COLOR);
+
+        JPanel navPanel = new JPanel(new BorderLayout());
+        navPanel.setBackground(CinemaAppWindow.BG_COLOR);
+
         JButton btnBack = new JButton("<< Back");
         btnBack.addActionListener(e -> app.switchScreen("SHOWTIME"));
 
         JLabel title = new JLabel("Select Seats", JLabel.CENTER);
         title.setFont(new Font("Tahoma", Font.BOLD, 18));
 
-        topPanel.add(btnBack, BorderLayout.WEST);
-        topPanel.add(title, BorderLayout.CENTER);
+        navPanel.add(btnBack, BorderLayout.WEST);
+        navPanel.add(title, BorderLayout.CENTER);
+
+        JPanel titleContainer = new JPanel(new GridLayout(2, 1, 5, 5)); // ใช้ GridLayout 2 แถว
+        titleContainer.setBackground(CinemaAppWindow.BG_COLOR);
+
+        JLabel screenLabel = new JLabel("SCREEN", JLabel.CENTER);
+        screenLabel.setOpaque(true);
+        screenLabel.setBackground(java.awt.Color.BLACK);
+        screenLabel.setForeground(java.awt.Color.WHITE);
+        screenLabel.setPreferredSize(new java.awt.Dimension(0, 30)); // กำหนดความสูงของแถบดำ
+        screenLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+
+        topPanel.add(navPanel, BorderLayout.NORTH);
+        topPanel.add(screenLabel, BorderLayout.SOUTH);
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(topPanel, BorderLayout.NORTH);
 

@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane; // เพิ่มการ import
 import javax.swing.border.EmptyBorder;
 
 public class PaymentPanel extends JPanel {
@@ -24,6 +25,7 @@ public class PaymentPanel extends JPanel {
         title.setBorder(new EmptyBorder(20, 0, 20, 0));
         add(title, BorderLayout.NORTH);
 
+        // --- ส่วนที่แก้ไข: สร้าง Panel สำหรับเนื้อหา ---
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBorder(new EmptyBorder(20, 100, 20, 100));
@@ -33,7 +35,12 @@ public class PaymentPanel extends JPanel {
         lblDetails.setFont(new Font("Monospaced", Font.PLAIN, 16));
         centerPanel.add(lblDetails);
 
-        add(centerPanel, BorderLayout.CENTER);
+        // --- เพิ่ม JScrollPane ครอบ centerPanel ---
+        JScrollPane scrollPane = new JScrollPane(centerPanel);
+        scrollPane.setBorder(null); // เอาเส้นขอบของ ScrollPane ออกเพื่อให้กลืนกับพื้นหลัง
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // ทำให้การเลื่อนเมาส์ลื่นไหลขึ้น
+        add(scrollPane, BorderLayout.CENTER); // เพิ่ม scrollPane ลงในทิศ CENTER แทน centerPanel โดยตรง
+        // ------------------------------------------
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
         btnPanel.setBackground(java.awt.Color.WHITE);

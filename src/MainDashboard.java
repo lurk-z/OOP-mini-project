@@ -475,16 +475,37 @@ private void showReportPage(){
     lblChart.setForeground(Color.WHITE);
     lblChart.setBorder(new EmptyBorder(0, 0, 15, 0));
     chartPanel.add(lblChart, BorderLayout.NORTH);
-    
-    // สร้างกราฟจำลอง (ใช้ Panel + ProgressBar)
-    JPanel bars = new JPanel(new GridLayout(4, 1, 0, 10)); // 4 เรื่อง
+    // Top movies from database
+    JPanel bars = new JPanel(new GridLayout(0, 1, 0, 10));
     bars.setOpaque(false);
-    
-    bars.add(createBarItem("Avatar 2", 85, new Color(46, 204, 113))); // 85%
-    bars.add(createBarItem("Iron Man", 60, new Color(52, 152, 219)));
-    bars.add(createBarItem("Frozen", 40, new Color(155, 89, 182)));
-    bars.add(createBarItem("Horror Night", 20, new Color(231, 76, 60)));
-    
+
+    List<MovieSales> topMovies = TransactionManager.getTopSellingMovies(4);
+    if (topMovies.isEmpty()) {
+        JLabel emptyLabel = new JLabel("No sales yet");
+        emptyLabel.setForeground(Color.LIGHT_GRAY);
+        bars.add(emptyLabel);
+    } else {
+        int maxCount = 1;
+        for (MovieSales ms : topMovies) {
+            if (ms.getCount() > maxCount) {
+                maxCount = ms.getCount();
+            }
+        }
+        Color[] colors = {
+            new Color(46, 204, 113),
+            new Color(52, 152, 219),
+            new Color(155, 89, 182),
+            new Color(231, 76, 60)
+        };
+        int i = 0;
+        for (MovieSales ms : topMovies) {
+            int percent = (int) Math.round((ms.getCount() * 100.0) / maxCount);
+            String label = ms.getTitle() + " (" + ms.getCount() + ")";
+            bars.add(createBarItem(label, percent, colors[i % colors.length]));
+            i++;
+        }
+    }
+
     chartPanel.add(bars, BorderLayout.CENTER);
     mainLayout.add(chartPanel);
     mainLayout.add(Box.createRigidArea(new Dimension(0, 30))); // เว้นระยะ
@@ -499,24 +520,15 @@ private void showReportPage(){
     
     String[] cols = {"Time", "Movie", "Seat", "Price"};
     DefaultTableModel tableModel = new DefaultTableModel(cols, 0);
-    
-    // โหลดการขายล่าสุดจาก Database
-    java.util.List<Transaction> recentTransactions = TransactionManager.getAllTransactions();
-    int count = 0;
-    for (Transaction t : recentTransactions) {
-        if (count >= 10) break; // แสดง 10 รายการล่าสุด
-        // ดึงข้อมูล Movie จาก Schedule
-        for (Schedule sched : ScheduleManager.getAllSchedules()) {
-            if (sched.getId() == t.getScheduleId()) {
-                Product prod = ProductManager.getProduct(sched.getProductId());
-                String movieTitle = (prod != null) ? prod.getTitle() : "Unknown";
-                tableModel.addRow(new Object[]{sched.getTime(), movieTitle, t.getSeat(), t.getPrice()});
-                count++;
-                break;
-            }
-        }
+    for (ReportTransaction t : TransactionManager.getRecentTransactions(10)) {
+        tableModel.addRow(new Object[]{
+            t.getTimestamp(),
+            t.getMovieTitle(),
+            t.getSeat(),
+            String.format("%.2f", t.getPrice())
+        });
     }
-    
+
     JTable table = new JTable(tableModel);
     table.setRowHeight(30);
     JScrollPane scroll = new JScrollPane(table);

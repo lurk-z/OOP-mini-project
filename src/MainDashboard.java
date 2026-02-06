@@ -1,7 +1,9 @@
 import java.awt.*;
+import java.util.Calendar;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 public class MainDashboard extends JFrame {
@@ -610,51 +612,236 @@ private JPanel createBarItem(String name, int percent, Color color) {
 // หน้า Dialog ของ Date (ตอนกดปุ่ม Add date)
     private void showAddDateDialog() {
         JDialog dialog = new JDialog(this, "Select Date", true);
-        dialog.setSize(400, 250);
+        dialog.setSize(450, 420);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new BorderLayout());
 
-        // ส่วนกลาง - เลือกวันที่
-        JPanel centerPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-        centerPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        // ส่วนกลาง - ปฏิทิน
+        JPanel calendarPanel = new JPanel();
+        calendarPanel.setLayout(new BoxLayout(calendarPanel, BoxLayout.Y_AXIS));
+        calendarPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        calendarPanel.setBackground(new Color(240, 240, 240));
 
-        JLabel lblDay = new JLabel("Day:");
-        JSpinner spinDay = new JSpinner(new SpinnerNumberModel(1, 1, 31, 1));
-        spinDay.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        // ส่วน Header - เลือก เดือน/ปี
+        JPanel headerPanel = new JPanel(new GridBagLayout());
+        headerPanel.setOpaque(false);
+        headerPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel lblMonth = new JLabel("Month:");
-        JSpinner spinMonth = new JSpinner(new SpinnerNumberModel(1, 1, 12, 1));
-        spinMonth.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        // Variables สำหรับจัดการเดือน/ปี
+        final int[] displayMonth = {Calendar.SEPTEMBER};
+        final int[] displayYear = {2025};
+        
+        JLabel lblMonth = new JLabel("September");
+        lblMonth.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblMonth.setHorizontalAlignment(JLabel.CENTER);
 
-        JLabel lblYear = new JLabel("Year:");
-        JSpinner spinYear = new JSpinner(new SpinnerNumberModel(2026, 2020, 2050, 1));
-        spinYear.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JButton prevMonth = new JButton("<");
+        prevMonth.setPreferredSize(new Dimension(45, 35));
+        prevMonth.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        prevMonth.setFocusPainted(false);
 
-        JLabel lblPreview = new JLabel("Preview: --/--/----");
-        lblPreview.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblPreview.setForeground(new Color(52, 152, 219));
+        JButton nextMonth = new JButton(">");
+        nextMonth.setPreferredSize(new Dimension(45, 35));
+        nextMonth.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        nextMonth.setFocusPainted(false);
 
-        // Update preview เมื่อเลือก
-        ChangeListener updatePreview = e -> {
-            int day = (int) spinDay.getValue();
-            int month = (int) spinMonth.getValue();
-            int year = (int) spinYear.getValue();
-            lblPreview.setText(String.format("Preview: %02d %02d %04d", day, month, year));
+        JLabel lblYear = new JLabel("2025");
+        lblYear.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblYear.setHorizontalAlignment(JLabel.CENTER);
+
+        JButton prevYear = new JButton("<");
+        prevYear.setPreferredSize(new Dimension(45, 35));
+        prevYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        prevYear.setFocusPainted(false);
+
+        JButton nextYear = new JButton(">");
+        nextYear.setPreferredSize(new Dimension(45, 35));
+        nextYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        nextYear.setFocusPainted(false);
+
+        // GridBagConstraints สำหรับจัดวาง
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.BOTH;
+
+        // แถวแรก: < September >
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0;
+        headerPanel.add(prevMonth, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        headerPanel.add(lblMonth, gbc);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+        headerPanel.add(nextMonth, gbc);
+
+        // แถวที่สอง: < 2025 >
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
+        headerPanel.add(prevYear, gbc);
+
+        gbc.gridx = 1;
+        gbc.weightx = 1;
+        headerPanel.add(lblYear, gbc);
+
+        gbc.gridx = 2;
+        gbc.weightx = 0;
+        headerPanel.add(nextYear, gbc);
+
+        calendarPanel.add(headerPanel);
+
+        // ส่วน Days of week
+        String[] dayNames = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        JPanel daysHeaderPanel = new JPanel(new GridLayout(1, 7, 2, 2));
+        daysHeaderPanel.setOpaque(false);
+        daysHeaderPanel.setBorder(new EmptyBorder(10, 0, 5, 0));
+        for (String day : dayNames) {
+            JLabel lbl = new JLabel(day);
+            lbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
+            lbl.setHorizontalAlignment(JLabel.CENTER);
+            daysHeaderPanel.add(lbl);
+        }
+        calendarPanel.add(daysHeaderPanel);
+
+        // ส่วน Calendar Grid
+        JPanel calendarGridPanel = new JPanel(new GridLayout(6, 7, 2, 2));
+        calendarGridPanel.setOpaque(false);
+        
+        // Variable ที่ใช้ในเพิ่ม
+        final int[] selectedDay = {20};
+        final int[] selectedMonth = {Calendar.SEPTEMBER + 1};
+        final int[] selectedYear = {2025};
+        
+        // สร้างปุ่มสำหรับแต่ละวัน
+        final JButton[] dayButtons = new JButton[42];
+        
+        // Method เพื่อรีเฟรชปฏิทิน
+        Runnable refreshCalendar = () -> {
+            // ลบปุ่มเดิมออก
+            calendarGridPanel.removeAll();
+            
+            // สร้างปุ่มใหม่
+            Calendar displayCal = Calendar.getInstance();
+            displayCal.set(displayYear[0], displayMonth[0], 1);
+            
+            int dayCount = 0;
+            for (int week = 0; week < 6; week++) {
+                for (int day = 0; day < 7; day++) {
+                    JButton btn = new JButton();
+                    btn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                    btn.setFocusPainted(false);
+                    btn.setOpaque(true);
+                    btn.setBorder(new LineBorder(new Color(200, 200, 200), 1));
+                    dayButtons[dayCount] = btn;
+                    dayCount++;
+                    calendarGridPanel.add(btn);
+                }
+            }
+            
+            // Fill calendar days
+            int firstDayOfWeek = displayCal.get(Calendar.DAY_OF_WEEK) - 1;
+            int daysInMonth = displayCal.getActualMaximum(Calendar.DAY_OF_MONTH);
+            
+            // วันของเดือนที่แล้ว
+            for (int i = 0; i < firstDayOfWeek; i++) {
+                dayButtons[i].setText("");
+                dayButtons[i].setEnabled(false);
+                dayButtons[i].setBackground(new Color(240, 240, 240));
+            }
+            
+            // วันของเดือนปัจจุบัน
+            for (int day = 1; day <= daysInMonth; day++) {
+                int btnIndex = firstDayOfWeek + day - 1;
+                dayButtons[btnIndex].setText(String.valueOf(day));
+                dayButtons[btnIndex].setEnabled(true);
+                
+                if (day == 20 && displayMonth[0] == Calendar.SEPTEMBER && displayYear[0] == 2025) {
+                    dayButtons[btnIndex].setBackground(new Color(100, 150, 200));
+                    dayButtons[btnIndex].setForeground(Color.WHITE);
+                } else {
+                    dayButtons[btnIndex].setBackground(Color.WHITE);
+                    dayButtons[btnIndex].setForeground(Color.BLACK);
+                }
+                
+                final int currentDay = day;
+                dayButtons[btnIndex].addActionListener(e -> {
+                    // Reset previous selection
+                    for (JButton b : dayButtons) {
+                        if (b.isEnabled() && !b.getText().isEmpty()) {
+                            b.setBackground(Color.WHITE);
+                            b.setForeground(Color.BLACK);
+                        }
+                    }
+                    // Select current button
+                    dayButtons[btnIndex].setBackground(new Color(100, 150, 200));
+                    dayButtons[btnIndex].setForeground(Color.WHITE);
+                    
+                    selectedDay[0] = currentDay;
+                    selectedMonth[0] = displayMonth[0] + 1;
+                    selectedYear[0] = displayYear[0];
+                });
+            }
+            
+            // วันของเดือนถัดไป
+            for (int i = firstDayOfWeek + daysInMonth; i < 42; i++) {
+                dayButtons[i].setText("");
+                dayButtons[i].setEnabled(false);
+                dayButtons[i].setBackground(new Color(240, 240, 240));
+            }
+            
+            calendarGridPanel.revalidate();
+            calendarGridPanel.repaint();
         };
-        spinDay.addChangeListener(updatePreview);
-        spinMonth.addChangeListener(updatePreview);
-        spinYear.addChangeListener(updatePreview);
+        
+        // เรียก refresh ครั้งแรก
+        refreshCalendar.run();
+        
+        // Action listeners สำหรับปุ่มเปลี่ยนเดือน/ปี
+        prevMonth.addActionListener(e -> {
+            displayMonth[0]--;
+            if (displayMonth[0] < 0) {
+                displayMonth[0] = 11;
+                displayYear[0]--;
+                lblYear.setText(String.valueOf(displayYear[0]));
+            }
+            String[] monthNames = {"January", "February", "March", "April", "May", "June", 
+                                 "July", "August", "September", "October", "November", "December"};
+            lblMonth.setText(monthNames[displayMonth[0]]);
+            refreshCalendar.run();
+        });
+        
+        nextMonth.addActionListener(e -> {
+            displayMonth[0]++;
+            if (displayMonth[0] > 11) {
+                displayMonth[0] = 0;
+                displayYear[0]++;
+                lblYear.setText(String.valueOf(displayYear[0]));
+            }
+            String[] monthNames = {"January", "February", "March", "April", "May", "June", 
+                                 "July", "August", "September", "October", "November", "December"};
+            lblMonth.setText(monthNames[displayMonth[0]]);
+            refreshCalendar.run();
+        });
+        
+        prevYear.addActionListener(e -> {
+            displayYear[0]--;
+            lblYear.setText(String.valueOf(displayYear[0]));
+            refreshCalendar.run();
+        });
+        
+        nextYear.addActionListener(e -> {
+            displayYear[0]++;
+            lblYear.setText(String.valueOf(displayYear[0]));
+            refreshCalendar.run();
+        });
+        
+        calendarPanel.add(calendarGridPanel);
 
-        centerPanel.add(lblDay);
-        centerPanel.add(spinDay);
-        centerPanel.add(lblMonth);
-        centerPanel.add(spinMonth);
-        centerPanel.add(lblYear);
-        centerPanel.add(spinYear);
-        centerPanel.add(new JLabel(""));
-        centerPanel.add(lblPreview);
-
-        dialog.add(centerPanel, BorderLayout.CENTER);
+        dialog.add(calendarPanel, BorderLayout.CENTER);
 
         // ส่วนล่าง - ปุ่ม
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -665,14 +852,15 @@ private JPanel createBarItem(String name, int percent, Color color) {
         btnSave.setForeground(Color.WHITE);
         btnSave.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnSave.addActionListener(e -> {
-            int day = (int) spinDay.getValue();
-            int month = (int) spinMonth.getValue();
-            int year = (int) spinYear.getValue();
-            String newDate = String.format("%02d %02d %04d", day, month, year);
-
-            int dateId = DateManager.addDate(newDate);
+            // สร้าง Calendar object จากการเลือก
+            Calendar selectedDate = Calendar.getInstance();
+            selectedDate.set(selectedYear[0], selectedMonth[0] - 1, selectedDay[0]);
+            
+            // เรียก addDate ด้วย Calendar object
+            int dateId = DateManager.addDate(selectedDate);
             if (dateId != -1) {
-                dateListModel.addElement(newDate);
+                String formattedDate = String.format("%02d %02d %04d", selectedDay[0], selectedMonth[0], selectedYear[0]);
+                dateListModel.addElement(formattedDate);
                 dialog.dispose();
             } else {
                 JOptionPane.showMessageDialog(dialog, "Date already exists");

@@ -1,11 +1,34 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import org.jdatepicker.impl.*;
+import java.util.Properties;
 
 public class DateManager {
 
-    // เพิ่มวันใหม่
+    // เพิ่มวันใหม่ - รับ Calendar object จาก JDatePicker
+    public static int addDate(Calendar calendar) {
+        if (calendar == null) {
+            System.err.println("Calendar object is null");
+            return -1;
+        }
+        
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+        String dateStr = String.format("%02d %02d %04d", day, month, year);
+        
+        return addDateString(dateStr);
+    }
+
+    // เพิ่มวันใหม่ - รับ String (สำหรับความเข้ากันได้)
     public static int addDate(String dateStr) {
+        return addDateString(dateStr);
+    }
+
+    // Method ภายใน - บันทึกลงฐานข้อมูล
+    private static int addDateString(String dateStr) {
         String sql = "INSERT INTO dates (date_str) VALUES (?)";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

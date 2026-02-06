@@ -66,7 +66,7 @@ public class MovieSelectionPanel extends JPanel {
         JPanel infoPanel = new JPanel(new GridLayout(2, 1));
         infoPanel.setBackground(java.awt.Color.WHITE);
 
-        JLabel priceLabel = new JLabel("Price: " + m.getPrice() + " THB", JLabel.CENTER);
+        // JLabel priceLabel = new JLabel("Price: " + m.getPrice() + " THB", JLabel.CENTER);ราคาหนนัง(มีทำไม?)
 
         JButton btnSelect = new JButton("Select");
         btnSelect.setBackground(CinemaAppWindow.PRIMARY_COLOR);
@@ -78,7 +78,7 @@ public class MovieSelectionPanel extends JPanel {
             app.switchScreen("SHOWTIME");
         });
 
-        infoPanel.add(priceLabel);
+        // infoPanel.add(priceLabel);ส่วนเรียกใช้ราคาหนัง
         infoPanel.add(btnSelect);
         card.add(infoPanel, BorderLayout.SOUTH);
 

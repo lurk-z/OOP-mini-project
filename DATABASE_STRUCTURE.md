@@ -9,7 +9,7 @@
    - title (TEXT) - ชื่อหนัง
    - category (TEXT) - หมวดหมู่
    - price (REAL) - ราคา
-
+   
 2. **dates** - วันฉาย
    - id (INTEGER) - ID วัน
    - date_str (TEXT) - รูปแบบ "DD MM YYYY"
